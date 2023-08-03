@@ -99,3 +99,10 @@ CREATE TABLE tweets (
     username VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+select birthdate from people where birthdate > 2005;
+
+select cast('9:12:7' as time);
+
+select * from people where birthtime > cast('12:0:0' as time);
+select * from people where birthtime between cast('12:0:0' as time) and cast('13:0:0' as time);

@@ -159,7 +159,53 @@ select released_year from books where released_year <= 2000;
 select released_year from books where released_year >= 2000 AND released_year <= 2015;
 select released_year from books where released_year between 2000 and 2015; -- inclusive for both lower and upper limit, generally used for comparing dates
 
+select author_lname from books where author_lname not in ('Carver', 'Lahiri', 'Smith');
 
+select released_year from books where released_year % 2 = 1;
+
+SELECT 
+    title,
+    released_year,
+    stock_quantity,
+    CASE
+        WHEN stock_quantity < 50 THEN '*'
+        WHEN
+            stock_quantity >= 50
+                AND stock_quantity <= 100
+        THEN
+            '**'
+        ELSE '***'
+    END AS stock_stars
+FROM
+    books;
+    
+delete from books where author_fname is null;
+select title from books where title not like '%0';
+
+-- like and '=' both are case-insensitive, so use binary for case-sensitive string comparisons
+select author_fname from books where binary author_fname like '%Da%';
+
+-- Exercise
+
+select 10 != 10; -- 0 / false
+select 15 > 14 and 99 - 5 <= 94; -- 1 / true
+select 1 in (5, 3) or 9 between 8 and 10; -- 1 / true
+
+select * from books where released_year < 1980;
+select * from books where author_lname in ('Eggers', 'Chabon');
+select * from books where author_lname = 'Lahiri' and released_year > 2000;
+select * from books where pages between 100 and 200;
+select author_lname from books where author_lname like 'c%' or 's%';
+
+select title, author_lname,
+case 
+when title like '%stories%' then 'Short stories'
+when title like '%just kids%' or '%a heartbreaking work%' then 'Memoir'
+else 'Novel'
+end as TYPE
+from books;
+
+select author_fname, author_lname, concat(count(*), ' Books') from books group by author_fname, author_lname;
 
 
 
