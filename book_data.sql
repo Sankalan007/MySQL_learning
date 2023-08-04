@@ -207,5 +207,10 @@ from books;
 
 select author_fname, author_lname, concat(count(*), ' Books') from books group by author_fname, author_lname;
 
+CREATE TABLE palindromes (
+    content VARCHAR(100) CHECK (REVERSE(content) = content)
+);
+
+insert into palindromes values ('abc');
 
 
