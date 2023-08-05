@@ -1,27 +1,29 @@
 create database tv_series;
 use tv_series;
 
-create table reviewers(
-id int primary key auto_increment,
-first_name varchar(100),
-last_name varchar(100)
+CREATE TABLE reviewers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100)
 );
 
-create table series(
-id int primary key auto_increment,
-title varchar(100),
-released_year int,
-genre varchar(40)
+CREATE TABLE series (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(100),
+    released_year INT,
+    genre VARCHAR(40)
 );
 
-create table reviews(
-id int primary key auto_increment,
-rating decimal(4,2),
-series_id int,
-reviewer_id int,
-foreign key(series_id) references series(id),
-foreign key(reviewer_id) references reviewers(id),
-constraint rating_constraint check(rating >= 0 and rating <= 10)
+CREATE TABLE reviews (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    rating DECIMAL(4 , 2 ),
+    series_id INT,
+    reviewer_id INT,
+    FOREIGN KEY (series_id)
+        REFERENCES series (id),
+    FOREIGN KEY (reviewer_id)
+        REFERENCES reviewers (id),
+    CONSTRAINT rating_constraint CHECK (rating >= 0 AND rating <= 10)
 );
 
 INSERT INTO series (title, released_year, genre) VALUES
@@ -66,28 +68,112 @@ INSERT INTO reviews(series_id, reviewer_id, rating) VALUES
     (14,2,8.5),(14,3,8.9),(14,4,8.9);
 
 
-select title, avg(rating) from series join reviews on series.id = reviews.series_id group by title;
-select title, round(avg(rating), 2) from series join reviews on series.id = reviews.series_id group by title;
+SELECT 
+    title, AVG(rating)
+FROM
+    series
+        JOIN
+    reviews ON series.id = reviews.series_id
+GROUP BY title;
+SELECT 
+    title, ROUND(AVG(rating), 2)
+FROM
+    series
+        JOIN
+    reviews ON series.id = reviews.series_id
+GROUP BY title;
 
-select first_name, last_name, rating from reviewers r join reviews rr on r.id = rr.reviewer_id;
-select title from series left join reviews on series.id = reviews.series_id where rating is null;
-select genre, round(avg(rating), 2) from series s join reviews r on s.id = r.reviewer_id group by genre;
+SELECT 
+    first_name, last_name, rating
+FROM
+    reviewers r
+        JOIN
+    reviews rr ON r.id = rr.reviewer_id;
+SELECT 
+    title
+FROM
+    series
+        LEFT JOIN
+    reviews ON series.id = reviews.series_id
+WHERE
+    rating IS NULL;
+SELECT 
+    genre, ROUND(AVG(rating), 2)
+FROM
+    series s
+        JOIN
+    reviews r ON s.id = r.reviewer_id
+GROUP BY genre;
 
 
-select first_name, last_name, count(ifnull(rating, 0)) as COUNT, min(ifnull(rating, 0)) as MIN, max(ifnull(rating, 0)) as MAX, IFNULL(round(avg(rating), 2), 0) as AVG, 
-case 
-when IFNULL(count(rating), -1) > 0 then 'ACTIVE'
-else 'INACTIVE'
-end as STATUS
-from reviewers s left join reviews r on s.id = r.reviewer_id
-group by first_name, last_name;
+SELECT 
+    first_name,
+    last_name,
+    COUNT(IFNULL(rating, 0)) AS COUNT,
+    MIN(IFNULL(rating, 0)) AS MIN,
+    MAX(IFNULL(rating, 0)) AS MAX,
+    IFNULL(ROUND(AVG(rating), 2), 0) AS AVG,
+    CASE
+        WHEN IFNULL(COUNT(rating), - 1) > 0 THEN 'ACTIVE'
+        ELSE 'INACTIVE'
+    END AS STATUS
+FROM
+    reviewers s
+        LEFT JOIN
+    reviews r ON s.id = r.reviewer_id
+GROUP BY first_name , last_name;
 
-select title, rating, concat(first_name, ' ', last_name) as reviewer from (series s join reviews r on s.id = r.series_id) join reviewers rr on r.reviewer_id = rr.id;
+SELECT 
+    title,
+    rating,
+    CONCAT(first_name, ' ', last_name) AS reviewer
+FROM
+    (series s
+    JOIN reviews r ON s.id = r.series_id)
+        JOIN
+    reviewers rr ON r.reviewer_id = rr.id;
 
 
-create view series_ratings as
-select title, avg(ifnull(rating, 0)) from series s left join reviews r on s.id = r.series_id group by title;
+CREATE VIEW series_ratings AS
+    SELECT 
+        title, AVG(IFNULL(rating, 0))
+    FROM
+        series s
+            LEFT JOIN
+        reviews r ON s.id = r.series_id
+    GROUP BY title;
 
-select * from series_ratings;
+SELECT 
+    *
+FROM
+    series_ratings;
 
-select genre, round(avg(rating), 2) from series s join reviews r on s.id = r.reviewer_id group by genre having round(avg(rating), 2) > 7;
+SELECT 
+    genre, ROUND(AVG(rating), 2)
+FROM
+    series s
+        JOIN
+    reviews r ON s.id = r.reviewer_id
+GROUP BY genre
+HAVING ROUND(AVG(rating), 2) > 7;
+
+SELECT 
+    title, ROUND(AVG(rating), 2)
+FROM
+    series
+        JOIN
+    reviews ON series.id = reviews.series_id
+GROUP BY title WITH ROLLUP;
+
+select @@global.sql_mode;
+select @@session.sql_mode;
+
+select 3/0;
+show warnings;
+
+
+set session sql_mode = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION';
+
+select 3/0;
+
+
